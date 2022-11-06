@@ -1,0 +1,15 @@
+.product-list {
+  .icon-edit {
+    cursor: pointer;
+    &:hover {
+      color: orange;
+    }
+  }
+
+  .icon-delete {
+    cursor: pointer;
+    &:hover {
+      color: rgb(157, 8, 8);
+    }
+  }
+}
