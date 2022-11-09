@@ -27,26 +27,7 @@ const _nav = [
       text: 'NEW',
     },
   },
-  // {
-  //   component: CNavTitle,
-  //   name: 'Theme',
-  // },
-  // {
-  //   component: CNavItem,
-  //   name: 'Colors',
-  //   to: '/theme/colors',
-  //   icon: <CIcon icon={cilDrop} customClassName="nav-icon" />,
-  // },
-  // {
-  //   component: CNavItem,
-  //   name: 'Typography',
-  //   to: '/theme/typography',
-  //   icon: <CIcon icon={cilPencil} customClassName="nav-icon" />,
-  // },
-  // {
-  //   component: CNavTitle,
-  //   name: 'Components',
-  // },
+
   {
     component: CNavGroup,
     name: 'Orders',
@@ -76,13 +57,13 @@ const _nav = [
   {
     component: CNavGroup,
     name: 'Products',
-    to: '/products',
+    to: '/',
     icon: <CIcon icon={cilPuzzle} customClassName="nav-icon" />,
     items: [
       {
         component: CNavItem,
         name: 'Products list',
-        to: '/product',
+        to: '/',
       },
     ],
   },

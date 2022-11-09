@@ -18,6 +18,7 @@ import {
   ORDER_DETAILS_SUCCESS,
   ORDER_DETAILS_FAIL,
   CLEAR_ERRORS,
+  CHANGE_PAGE_PAGINATION,
 } from '../constants/orderConstant'
 
 import axios from 'axios'
@@ -71,18 +72,25 @@ export const myOrders = () => async (dispatch) => {
   }
 }
 
+export function changePagePagination(value) {
+  return {
+    type: CHANGE_PAGE_PAGINATION,
+    payload: value,
+  }
+}
+
 // Get All Orders (admin)
-export const getAllOrders = () => async (dispatch) => {
+export const getAllOrders = (maxPrice) => async (dispatch) => {
   try {
     dispatch({ type: ALL_ORDERS_REQUEST })
 
-    const { data } = await axios.get('http://localhost:5000/orders')
+    const { data } = await axios.get(`http://localhost:5000/orders?maxPrice=${maxPrice}`)
 
     dispatch({ type: ALL_ORDERS_SUCCESS, payload: data.orders })
   } catch (error) {
     dispatch({
       type: ALL_ORDERS_FAIL,
-      payload: error.response.data.message,
+      payload: error.response,
     })
   }
 }
@@ -91,7 +99,6 @@ export const getAllOrders = () => async (dispatch) => {
 export const updateOrder = (id, order) => async (dispatch) => {
   try {
     dispatch({ type: UPDATE_ORDER_REQUEST })
-
     const config = {
       headers: {
         'Content-Type': 'application/json',
@@ -99,11 +106,11 @@ export const updateOrder = (id, order) => async (dispatch) => {
     }
     const { data } = await axios.put(`http://localhost:5000/orders/${id}`, order, config)
 
-    dispatch({ type: UPDATE_ORDER_SUCCESS, payload: data.success })
+    dispatch({ type: UPDATE_ORDER_SUCCESS, payload: data.message })
   } catch (error) {
     dispatch({
       type: UPDATE_ORDER_FAIL,
-      payload: error.response.data.message,
+      payload: error.response,
     })
   }
 }
@@ -115,7 +122,7 @@ export const deleteOrder = (id) => async (dispatch) => {
 
     const { data } = await axios.delete(`http://localhost:5000/orders/${id}`)
 
-    dispatch({ type: DELETE_ORDER_SUCCESS, payload: data.success })
+    dispatch({ type: DELETE_ORDER_SUCCESS, payload: data.message })
   } catch (error) {
     dispatch({
       type: DELETE_ORDER_FAIL,
@@ -129,7 +136,7 @@ export const getOrderDetails = (id) => async (dispatch) => {
   try {
     dispatch({ type: ORDER_DETAILS_REQUEST })
 
-    const { data } = await axios.get(`/api/v1/order/${id}`)
+    const { data } = await axios.get(`http://localhost:5000/order/${id}`)
 
     dispatch({ type: ORDER_DETAILS_SUCCESS, payload: data.order })
   } catch (error) {

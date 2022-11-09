@@ -20,7 +20,20 @@ import {
   ORDER_DETAILS_SUCCESS,
   ORDER_DETAILS_FAIL,
   CLEAR_ERRORS,
+  CHANGE_PAGE_PAGINATION,
 } from '../constants/orderConstant'
+
+const limit = 6
+
+const initialState = {
+  currentPage: 1,
+  noPage: 0,
+  pending: false,
+  error: null,
+  products: [],
+  loading: null,
+  orders: [],
+}
 
 export const newOrderReducer = (state = {}, action) => {
   switch (action.type) {
@@ -46,7 +59,6 @@ export const newOrderReducer = (state = {}, action) => {
         ...state,
         error: null,
       }
-
     default:
       return state
   }
@@ -81,21 +93,25 @@ export const myOrdersReducer = (state = { orders: [] }, action) => {
   }
 }
 
-export const allOrdersReducer = (state = { orders: [] }, action) => {
+export const allOrdersReducer = (state = initialState, action) => {
   switch (action.type) {
     case ALL_ORDERS_REQUEST:
       return {
+        ...state,
         loading: true,
       }
 
     case ALL_ORDERS_SUCCESS:
       return {
+        ...state,
         loading: false,
-        orders: action.payload,
+        orders: action.payload.slice((state?.currentPage - 1) * limit, state?.currentPage * limit),
+        noPage: Math.ceil(action.payload?.length / limit),
       }
 
     case ALL_ORDERS_FAIL:
       return {
+        ...state,
         loading: false,
         error: action.payload,
       }
@@ -104,7 +120,11 @@ export const allOrdersReducer = (state = { orders: [] }, action) => {
         ...state,
         error: null,
       }
-
+    case CHANGE_PAGE_PAGINATION:
+      return {
+        ...state,
+        currentPage: action.payload,
+      }
     default:
       return state
   }

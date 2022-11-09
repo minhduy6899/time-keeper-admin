@@ -52,6 +52,7 @@ export const productsReducer = (state = initialState, action) => {
     case ALL_PRODUCT_REQUEST:
     case ADMIN_PRODUCT_REQUEST:
       return {
+        ...state,
         loading: true,
         products: [],
       }
@@ -69,8 +70,11 @@ export const productsReducer = (state = initialState, action) => {
       return {
         ...state,
         loading: false,
-        products: action.payload,
-        // .slice((state.currentPage - 1) * limit, state.currentPage * limit)
+        products: action.payload.slice(
+          (state?.currentPage - 1) * limit,
+          state?.currentPage * limit,
+        ),
+        //
         noPage: Math.ceil(action.payload.length / limit),
       }
 

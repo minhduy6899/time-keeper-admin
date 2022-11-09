@@ -92,7 +92,7 @@ export default function Products() {
     }
 
     dispatch(getAdminProduct(filterName))
-  }, [dispatch, alert, error, deleteError, navigate, isDeleted, success, filterName])
+  }, [dispatch, alert, error, deleteError, navigate, isDeleted, success, filterName, currentPage])
   return (
     <div className="product-list">
       <Typography variant="h4" component="h2" align="center">

@@ -17,19 +17,17 @@ import { cilBell, cilEnvelopeOpen, cilList, cilMenu } from '@coreui/icons'
 import { AppBreadcrumb } from './index'
 import { AppHeaderDropdown } from './header/index'
 import { logo } from 'src/assets/brand/logo'
+import { toggleSideBar } from 'src/actions/sidebarShowAction'
 
 const AppHeader = () => {
   const dispatch = useDispatch()
-  const sidebarShow = useSelector((state) => state.sidebarShow)
-
+  const sidebarShow = useSelector((state) => state.changeState)
+  console.log('check sidebarshow>>>>', sidebarShow.sidebarShow)
   return (
     <CHeader position="sticky" className="mb-4">
       <CContainer fluid>
-        <CHeaderToggler
-          className="ps-1"
-          onClick={() => dispatch({ type: 'set', sidebarShow: !sidebarShow })}
-        >
-          <CIcon icon={cilMenu} size="lg" />
+        <CHeaderToggler className="ps-1">
+          <CIcon icon={cilMenu} size="lg" onClick={() => toggleSideBar(!sidebarShow)} />
         </CHeaderToggler>
         <CHeaderBrand className="mx-auto d-md-none" to="/">
           <CIcon icon={logo} height={48} alt="Logo" />
@@ -55,15 +53,6 @@ const AppHeader = () => {
               Products
             </CNavLink>
           </CNavItem>
-          {/* <CNavItem>
-            <CNavLink href="http://localhost:3001/Users">Users</CNavLink>
-          </CNavItem>
-          <CNavItem>
-            <CNavLink href="http://localhost:3001/Carts">Carts</CNavLink>
-          </CNavItem>
-          <CNavItem>
-            <CNavLink href="http://localhost:3001/Settings">Settings</CNavLink>
-          </CNavItem> */}
         </CHeaderNav>
         <CHeaderNav>
           <CNavItem>

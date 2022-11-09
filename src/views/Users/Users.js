@@ -98,10 +98,8 @@ export default function Users() {
         setOpenAlert(false)
       }, 5000)
     }
-    dispatch(getAllUsers())
+    dispatch(getAllUsers(filterName))
   }, [dispatch, isDeleted])
-  // dispatch, alert, error, deleteError, isDeleted, success, filterName
-  console.log('check user: ', users)
 
   return (
     <div className="product-list">
@@ -131,10 +129,10 @@ export default function Users() {
           <TableHead>
             <TableRow>
               <TableCell>Product ID</TableCell>
-              <TableCell align="center">Full Name</TableCell>
-              <TableCell align="center">User Name</TableCell>
-              <TableCell align="center">Role</TableCell>
-              <TableCell align="center">Address</TableCell>
+              <TableCell align="start">Full Name</TableCell>
+              <TableCell align="start">User Name</TableCell>
+              <TableCell align="start">Role</TableCell>
+              <TableCell align="start">Address</TableCell>
               <TableCell align="center">Action</TableCell>
             </TableRow>
           </TableHead>
@@ -144,10 +142,10 @@ export default function Users() {
                 <TableCell component="th" scope="row">
                   {user?._id}
                 </TableCell>
-                <TableCell align="center">{user?.fullName}</TableCell>
-                <TableCell align="center">{user?.username}</TableCell>
-                <TableCell align="center">{user?.address}</TableCell>
-                <TableCell align="center">{user?.role}</TableCell>
+                <TableCell align="start">{user?.fullName}</TableCell>
+                <TableCell align="start">{user?.username}</TableCell>
+                <TableCell align="start">{user?.address}</TableCell>
+                <TableCell align="start">{user?.role}</TableCell>
                 <TableCell align="center">
                   <Box sx={{ display: 'flex', justifyContent: 'space-evenly' }}>
                     <EditIcon

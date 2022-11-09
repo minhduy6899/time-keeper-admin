@@ -80,8 +80,6 @@ export default function ModalEditUser({
     }
   }, [error, isUpdated])
 
-  console.log('check user detail: ', user)
-
   return (
     <div className="modal_create-product">
       {user && loading === false && (

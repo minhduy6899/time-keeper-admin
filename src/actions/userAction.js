@@ -210,10 +210,10 @@ export const resetPassword = (token, passwords) => async (dispatch) => {
 }
 
 // get All Users
-export const getAllUsers = () => async (dispatch) => {
+export const getAllUsers = (username) => async (dispatch) => {
   try {
     dispatch({ type: ALL_USERS_REQUEST })
-    const { data } = await axios.get(`http://localhost:5000/customers`)
+    const { data } = await axios.get(`http://localhost:5000/customers?username=${username}`)
 
     dispatch({ type: ALL_USERS_SUCCESS, payload: data.customer })
   } catch (error) {

@@ -21,7 +21,6 @@ import {
   getAdminProduct,
   deleteProduct,
   updateProduct,
-  changePagePagination,
   getProductDetails,
 } from '../../actions/productAction'
 import { Button, Pagination, Stack, TextField, Typography } from '@mui/material'
@@ -30,16 +29,27 @@ import ModalCreateProduct from '../modal/product/ModalCreateProduct'
 import ModalEditProduct from '../modal/product/ModalEditProduct'
 import BasicAlerts from '../Alert/Alert'
 import { Box, Grid } from '@material-ui/core'
-import { deleteOrder, getAllOrders } from 'src/actions/orderAction'
+import {
+  changePagePagination,
+  deleteOrder,
+  getAllOrders,
+  getOrderDetails,
+} from 'src/actions/orderAction'
 import { DELETE_ORDER_RESET } from 'src/constants/orderConstant'
 import ModalCreateOrder from '../modal/order/ModalCreateOrder'
+import ModalEditOrder from '../modal/order/ModalEditOrder'
 
 export default function Orders() {
   const dispatch = useDispatch()
   const navigate = useNavigate()
 
-  const { error, orders, loading } = useSelector((state) => state.allOrdersReducer)
+  const { error, orders, loading, currentPage } = useSelector((state) => state.allOrdersReducer)
   const { error: deleteError, isDeleted } = useSelector((state) => state.orderReducer)
+  const {
+    error: getOrderError,
+    order,
+    loading: getOrderLoading,
+  } = useSelector((state) => state.orderDetailsReducer)
   const { error: createErorr, success } = useSelector((state) => state.newProductReducer)
 
   const [openModalCreateProduct, setOpenModalCreateProduct] = useState(false)
@@ -48,13 +58,13 @@ export default function Orders() {
   const [message, setMessage] = useState('')
   const [openAlert, setOpenAlert] = useState(false)
   const [productId, setProductId] = useState('')
-  const [filterName, setFilterName] = useState()
+  const [filterName, setFilterName] = useState(1)
 
   const handleOpenModalCreateProduct = () => setOpenModalCreateProduct(true)
   const handleCloseModalCreateProduct = useCallback(() => setOpenModalCreateProduct(false), [])
 
   const handleOpenModalEditProduct = (id) => {
-    dispatch(getProductDetails(id))
+    dispatch(getOrderDetails(id))
     setProductId(id)
     setOpenModalEditProduct(true)
   }
@@ -94,10 +104,8 @@ export default function Orders() {
       }, 5000)
     }
 
-    dispatch(getAllOrders())
-  }, [dispatch, alert, error, deleteError, navigate, isDeleted, success, filterName])
-
-  console.log('check order: ', orders)
+    dispatch(getAllOrders(filterName || 0))
+  }, [dispatch, alert, error, deleteError, navigate, isDeleted, success, filterName, currentPage])
 
   return (
     <div className="order-list">
@@ -117,7 +125,7 @@ export default function Orders() {
         />
         <TextField
           id="standard-basic"
-          label="Search by Name"
+          label="Search by max Price"
           variant="standard"
           onChange={(e) => setFilterName(e.target.value)}
         />
@@ -128,8 +136,10 @@ export default function Orders() {
             <TableRow>
               <TableCell>Order ID</TableCell>
               <TableCell align="center">Item Price ($)</TableCell>
-              <TableCell align="center">Shipping Info</TableCell>
-              <TableCell align="center">Total Price ($)</TableCell>
+              <TableCell align="start">User ID</TableCell>
+              <TableCell align="start">Shipping Info</TableCell>
+              <TableCell align="start">Total Price ($)</TableCell>
+              <TableCell align="start">Order status</TableCell>
               <TableCell align="center">Action</TableCell>
             </TableRow>
           </TableHead>
@@ -137,11 +147,13 @@ export default function Orders() {
             {orders?.map((order, index) => (
               <TableRow key={index} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
                 <TableCell component="th" scope="row">
-                  {order?._id}
+                  {(order?._id).slice(1, 9)}
                 </TableCell>
                 <TableCell align="center">{order?.itemsPrice}</TableCell>
-                <TableCell align="center">{`${order?.shippingInfo?.address}, ${order?.shippingInfo?.city}, ${order?.shippingInfo?.state}, ${order?.shippingInfo?.country}`}</TableCell>
-                <TableCell align="center">{order?.totalPrice}</TableCell>
+                <TableCell align="start">{order?.Customer}</TableCell>
+                <TableCell align="start">{`${order?.shippingInfo?.address}, ${order?.shippingInfo?.city}, ${order?.shippingInfo?.state}, ${order?.shippingInfo?.country}`}</TableCell>
+                <TableCell align="start">{order?.totalPrice}</TableCell>
+                <TableCell align="start">{order?.orderStatus}</TableCell>
                 <TableCell align="center">
                   <Box sx={{ display: 'flex', justifyContent: 'space-evenly' }}>
                     <EditIcon
@@ -173,7 +185,7 @@ export default function Orders() {
         </Grid>
       </Grid>
 
-      <ModalEditProduct
+      <ModalEditOrder
         openModalEditProduct={openModalEditProduct}
         setOpenModalEditProduct={setOpenModalEditProduct}
         handleOpenModalEditProduct={handleOpenModalEditProduct}

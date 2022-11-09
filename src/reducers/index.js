@@ -26,6 +26,8 @@ import {
   orderReducer,
 } from './orderReducer'
 
+import { changeState } from './sidebarShowReducer'
+
 const rootReducer = combineReducers({
   newProductReducer,
   newReviewReducer,
@@ -46,6 +48,8 @@ const rootReducer = combineReducers({
   newOrderReducer,
   orderDetailsReducer,
   orderReducer,
+
+  changeState,
 })
 
 export default rootReducer

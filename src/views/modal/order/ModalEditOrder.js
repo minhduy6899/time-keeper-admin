@@ -5,7 +5,7 @@ import Typography from '@mui/material/Typography'
 import Modal from '@mui/material/Modal'
 import { useState } from 'react'
 import AddCircleOutlineOutlinedIcon from '@mui/icons-material/AddCircleOutlineOutlined'
-import { Grid, TextField } from '@material-ui/core'
+import { FormControl, Grid, InputLabel, MenuItem, Select, TextField } from '@material-ui/core'
 import PropTypes from 'prop-types'
 import { useDispatch, useSelector } from 'react-redux'
 import EditIcon from '@mui/icons-material/Edit'
@@ -19,6 +19,8 @@ import {
 } from 'src/actions/productAction'
 import { NEW_PRODUCT_RESET, UPDATE_PRODUCT_RESET } from 'src/constants/productConstant'
 import BasicAlerts from 'src/views/Alert/Alert'
+import { getAllOrders, updateOrder } from 'src/actions/orderAction'
+import { UPDATE_ORDER_RESET } from 'src/constants/orderConstant'
 
 const style = {
   position: 'absolute',
@@ -32,7 +34,7 @@ const style = {
   p: 4,
 }
 
-export default function ModalEditProduct({
+export default function ModalEditOrder({
   openModalEditProduct,
   setOpenModalEditProduct,
   handleOpenModalEditProduct,
@@ -41,20 +43,24 @@ export default function ModalEditProduct({
   productId,
 }) {
   const dispatch = useDispatch()
-  const {
-    error,
-    product,
-    loading,
-    success: getProductSuccess,
-  } = useSelector((state) => state.productDetailsReducer)
+  const { error, orders, loading } = useSelector((state) => state.allOrdersReducer)
   const { error: createErorr, success } = useSelector((state) => state.newProductReducer)
-  const { loading: updateLoading, isUpdated } = useSelector((state) => state.productReducer)
+  const {
+    error: getOrderError,
+    order,
+    loading: getOrderLoading,
+  } = useSelector((state) => state.orderDetailsReducer)
+  const { loading: updateLoading, isUpdated } = useSelector((state) => state.orderReducer)
 
   const [inputDataProduct, setInputDataProduct] = useState({})
   const [severity, setSeverity] = useState('success')
   const [message, setMessage] = useState('')
   const [openAlert, setOpenAlert] = useState(false)
+  const [orderStatus, setOrderStatus] = React.useState('')
 
+  const handleChange = (event) => {
+    setOrderStatus({ orderStatus: event.target.value })
+  }
   const handleChangeInput = (e) => {
     setInputDataProduct({
       ...inputDataProduct,
@@ -63,7 +69,7 @@ export default function ModalEditProduct({
   }
 
   const handleEditProduct = () => {
-    dispatch(updateProduct(productId, inputDataProduct))
+    dispatch(updateOrder(productId, orderStatus))
   }
 
   React.useEffect(() => {
@@ -73,20 +79,19 @@ export default function ModalEditProduct({
 
     if (isUpdated) {
       handleCloseModalEditProduct()
-      setMessage('Product Update Successfully')
+      setMessage('Order Update Successfully')
       setSeverity('success')
       setOpenAlert(true)
-      dispatch({ type: UPDATE_PRODUCT_RESET })
+      dispatch({ type: UPDATE_ORDER_RESET })
       setTimeout(() => {
         setOpenAlert(false)
       }, 5000)
-      dispatch(getAdminProduct())
+      dispatch(getAllOrders(0))
     }
   }, [error, success, isUpdated])
-
   return (
     <div className="modal_create-product">
-      {getProductSuccess && loading === false && (
+      {order?.itemsPrice && loading === false && (
         <Modal
           open={openModalEditProduct}
           onClose={handleCloseModalEditProduct}
@@ -107,164 +112,84 @@ export default function ModalEditProduct({
             <Grid container spacing={2}>
               <Grid item xs={6}>
                 <TextField
-                  defaultValue={product?.name}
+                  defaultValue={order?.Customer}
                   onChange={handleChangeInput}
                   fullWidth
                   id="outlined-basic"
                   name="name"
-                  label="Name"
+                  label="customer id"
                   variant="filled"
+                  disabled
                 />
               </Grid>
               <Grid item xs={6}>
                 <TextField
-                  defaultValue={product?.imageUrl}
+                  defaultValue={order?.itemsPrice}
                   onChange={handleChangeInput}
                   fullWidth
                   id="outlined-basic"
-                  label="Image Url"
+                  label="itemsPrice"
                   name="imageUrl"
                   variant="filled"
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  defaultValue={product?.description}
-                  onChange={handleChangeInput}
-                  fullWidth
-                  id="outlined-basic"
-                  label="Description"
-                  name="description"
-                  variant="filled"
+                  disabled
                 />
               </Grid>
               <Grid item xs={6}>
                 <TextField
-                  defaultValue={product?.buyPrice}
+                  defaultValue={order?.shippingPrice}
                   onChange={handleChangeInput}
                   fullWidth
                   id="outlined-basic"
-                  label="Buy Price"
+                  label="shippingPrice"
                   type="number"
                   name="buyPrice"
                   variant="filled"
+                  disabled
                 />
               </Grid>
               <Grid item xs={6}>
                 <TextField
-                  defaultValue={product?.promotionPrice}
+                  defaultValue={order?.taxPrice}
                   onChange={handleChangeInput}
                   fullWidth
                   id="outlined-basic"
-                  label="Promotion Price"
+                  label="tax Price"
                   type="number"
                   name="promotionPrice"
                   variant="filled"
+                  disabled
                 />
               </Grid>
 
-              <Grid item xs={4}>
+              <Grid item xs={6}>
                 <TextField
-                  defaultValue={product?.category}
+                  defaultValue={order?.totalPrice}
                   onChange={handleChangeInput}
                   fullWidth
                   id="outlined-basic"
-                  label="Category"
+                  label="total Price"
                   name="category"
                   variant="filled"
+                  disabled
                 />
               </Grid>
-              <Grid item xs={4}>
-                <TextField
-                  defaultValue={product?.badge}
-                  onChange={handleChangeInput}
-                  fullWidth
-                  id="outlined-basic"
-                  label="Badge"
-                  name="badge"
-                  variant="filled"
-                />
-              </Grid>
-              <Grid item xs={4}>
-                <TextField
-                  defaultValue={product?.ratings}
-                  onChange={handleChangeInput}
-                  fullWidth
-                  id="outlined-basic"
-                  label="Ratings"
-                  type="number"
-                  name="ratings"
-                  variant="filled"
-                />
-              </Grid>
-
-              <Grid item xs={4}>
-                <TextField
-                  defaultValue={product?.color}
-                  onChange={handleChangeInput}
-                  fullWidth
-                  id="outlined-basic"
-                  label="Color"
-                  name="color"
-                  variant="filled"
-                />
-              </Grid>
-              <Grid item xs={4}>
-                <TextField
-                  defaultValue={product?.size}
-                  onChange={handleChangeInput}
-                  fullWidth
-                  id="outlined-basic"
-                  label="Size"
-                  name="size"
-                  variant="filled"
-                />
-              </Grid>
-              <Grid item xs={4}>
-                <TextField
-                  defaultValue={product?.amount}
-                  onChange={handleChangeInput}
-                  fullWidth
-                  id="outlined-basic"
-                  label="Amount"
-                  type="number"
-                  name="amount"
-                  variant="filled"
-                />
-              </Grid>
-
-              <Grid item xs={4}>
-                <TextField
-                  defaultValue={product?.thumbnail?.img1}
-                  onChange={handleChangeInput}
-                  fullWidth
-                  id="outlined-basic"
-                  label="Image first"
-                  name="img1"
-                  variant="filled"
-                />
-              </Grid>
-              <Grid item xs={4}>
-                <TextField
-                  defaultValue={product?.thumbnail?.img2}
-                  onChange={handleChangeInput}
-                  fullWidth
-                  id="outlined-basic"
-                  label="Image second"
-                  name="img2"
-                  variant="filled"
-                />
-              </Grid>
-              <Grid item xs={4}>
-                <TextField
-                  defaultValue={product?.thumbnail?.img3}
-                  onChange={handleChangeInput}
-                  fullWidth
-                  id="outlined-basic"
-                  label="Image third"
-                  name="img3"
-                  variant="filled"
-                />
+              <Grid item xs={6}>
+                <Box sx={{ minWidth: 120 }}>
+                  <FormControl variant="standard" fullWidth>
+                    <InputLabel id="demo-simple-select-label">Status</InputLabel>
+                    <Select
+                      labelId="demo-simple-select-label"
+                      id="demo-simple-select"
+                      value={orderStatus}
+                      label="orderStatus"
+                      onChange={handleChange}
+                    >
+                      <MenuItem value={'Processing'}>Processing</MenuItem>
+                      <MenuItem value={'Loading'}>Loading</MenuItem>
+                      <MenuItem value={'Shipped'}>Shipped</MenuItem>
+                    </Select>
+                  </FormControl>
+                </Box>
               </Grid>
               <Grid item xs={12} align="end" spacing={2}>
                 <Button
@@ -291,7 +216,7 @@ export default function ModalEditProduct({
   )
 }
 
-ModalEditProduct.propTypes = {
+ModalEditOrder.propTypes = {
   openModalEditProduct: PropTypes.node.isRequired,
   setOpenModalEditProduct: PropTypes.node.isRequired,
   handleOpenModalEditProduct: PropTypes.node.isRequired,
