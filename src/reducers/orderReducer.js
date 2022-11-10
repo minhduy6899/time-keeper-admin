@@ -21,6 +21,7 @@ import {
   ORDER_DETAILS_FAIL,
   CLEAR_ERRORS,
   CHANGE_PAGE_PAGINATION,
+  CREATE_ORDER_RESET,
 } from '../constants/orderConstant'
 
 const limit = 6
@@ -47,8 +48,13 @@ export const newOrderReducer = (state = {}, action) => {
       return {
         loading: false,
         order: action.payload,
+        success: true,
       }
-
+    case CREATE_ORDER_RESET:
+      return {
+        loading: false,
+        success: false,
+      }
     case CREATE_ORDER_FAIL:
       return {
         loading: false,

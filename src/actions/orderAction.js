@@ -34,11 +34,7 @@ export const createOrder = (order) => async (dispatch) => {
         Authorization: 'Bearer ' + localStorage.getItem('@token'),
       },
     }
-    const { data } = await axios.post(
-      'https://timekeeper-back-end.herokuapp.com/orders',
-      order,
-      config,
-    )
+    const { data } = await axios.post('http://localhost:5000/orders', order, config)
 
     dispatch({ type: CREATE_ORDER_SUCCESS, payload: data })
   } catch (error) {

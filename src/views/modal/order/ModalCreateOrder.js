@@ -11,6 +11,11 @@ import { useDispatch, useSelector } from 'react-redux'
 import { clearErrors, createProduct, getAdminProduct } from 'src/actions/productAction'
 import { NEW_PRODUCT_RESET } from 'src/constants/productConstant'
 import BasicAlerts from 'src/views/Alert/Alert'
+import { FormControl, InputLabel, MenuItem, Select } from '@mui/material'
+import { getAllUsers } from 'src/actions/userAction'
+import { Country, State } from 'country-state-city'
+import { createOrder, getAllOrders } from 'src/actions/orderAction'
+import { CREATE_ORDER_RESET } from 'src/constants/orderConstant'
 
 const style = {
   position: 'absolute',
@@ -32,12 +37,20 @@ export default function ModalCreateOrder({
 }) {
   const dispatch = useDispatch()
   const { error, products } = useSelector((state) => state.productsReducer)
-  const { error: createErorr, success } = useSelector((state) => state.newProductReducer)
+  const { error: createErorr, success } = useSelector((state) => state.newOrderReducer)
+  const { error: errorLoadAllUser, users, loading } = useSelector((state) => state.allUsersReducer)
+  const {
+    error: errorLoadAllProduct,
+    products: allProducts,
+    currentPage,
+    noPage,
+  } = useSelector((state) => state.productsReducer)
 
   const [inputDataProduct, setInputDataProduct] = useState({})
   const [severity, setSeverity] = useState('success')
   const [message, setMessage] = useState('')
   const [openAlert, setOpenAlert] = useState(false)
+  const [age, setAge] = React.useState('')
 
   const handleChangeInput = (e) => {
     setInputDataProduct({
@@ -46,8 +59,13 @@ export default function ModalCreateOrder({
     })
   }
 
-  const handleCreateProduct = () => {
-    dispatch(createProduct(inputDataProduct))
+  const handleCreateOrder = () => {
+    dispatch(createOrder(inputDataProduct))
+    setInputDataProduct({})
+  }
+
+  const handleChange = (event) => {
+    setAge(event.target.value)
   }
 
   React.useEffect(() => {
@@ -57,15 +75,17 @@ export default function ModalCreateOrder({
 
     if (success) {
       handleCloseModalCreateProduct()
-      setMessage('Product Create Successfully')
+      setMessage('Order Create Successfully')
       setSeverity('success')
       setOpenAlert(true)
-      dispatch({ type: NEW_PRODUCT_RESET })
+      dispatch({ type: CREATE_ORDER_RESET })
       setTimeout(() => {
         setOpenAlert(false)
       }, 5000)
-      dispatch(getAdminProduct())
+      dispatch(getAllOrders())
     }
+    dispatch(getAllUsers())
+    dispatch(getAdminProduct())
   }, [dispatch, alert, error, success])
 
   return (
@@ -92,27 +112,82 @@ export default function ModalCreateOrder({
           </Typography>
 
           <Grid container spacing={2}>
-            <Grid item xs={6}>
-              <TextField
-                autoComplete
-                onChange={handleChangeInput}
-                fullWidth
-                id="outlined-basic"
-                name="name"
-                label="Name"
-                variant="filled"
-              />
+            <Grid item xs={12}>
+              <Box sx={{ minWidth: 120 }}>
+                <FormControl fullWidth>
+                  <InputLabel id="demo-simple-select-label">User</InputLabel>
+                  <Select
+                    labelId="demo-simple-select-label"
+                    id="demo-simple-select"
+                    value={inputDataProduct?.Customer}
+                    label="Age"
+                    onChange={(e) =>
+                      setInputDataProduct({
+                        ...inputDataProduct,
+                        Customer: e.target.value,
+                      })
+                    }
+                  >
+                    {users?.map((user, index) => (
+                      <MenuItem key={index} value={user?._id}>
+                        {user?.fullName}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </Box>
             </Grid>
-            <Grid item xs={6}>
-              <TextField
-                autoComplete
-                onChange={handleChangeInput}
-                fullWidth
-                id="outlined-basic"
-                label="Image Url"
-                name="imageUrl"
-                variant="filled"
-              />
+
+            <Grid item xs={12}>
+              <Box sx={{ minWidth: 120 }}>
+                <FormControl fullWidth>
+                  <InputLabel id="demo-simple-select-label">Order Item</InputLabel>
+                  <Select
+                    labelId="demo-simple-select-label"
+                    id="demo-simple-select"
+                    value={inputDataProduct?.orderItems}
+                    label="Order item"
+                    onChange={(e) =>
+                      setInputDataProduct({
+                        ...inputDataProduct,
+                        orderItems: [{ product: e.target.value }],
+                      })
+                    }
+                  >
+                    {allProducts?.map((product, index) => (
+                      <MenuItem key={index} value={product?._id}>
+                        {product?.name}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </Box>
+            </Grid>
+
+            <Grid item xs={12}>
+              <Box sx={{ minWidth: 120 }}>
+                <FormControl fullWidth>
+                  <InputLabel id="demo-simple-select-label">Country</InputLabel>
+                  <Select
+                    labelId="demo-simple-select-label"
+                    id="demo-simple-select"
+                    value={inputDataProduct?.orderItems}
+                    label="Country"
+                    onChange={(e) =>
+                      setInputDataProduct({
+                        ...inputDataProduct,
+                        shippingInfo: { country: e.target.value },
+                      })
+                    }
+                  >
+                    {Country?.getAllCountries().map((item) => (
+                      <MenuItem key={item?.isoCode} value={item?.isoCode}>
+                        {item?.name}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </Box>
             </Grid>
             <Grid item xs={12}>
               <TextField
@@ -120,136 +195,20 @@ export default function ModalCreateOrder({
                 onChange={handleChangeInput}
                 fullWidth
                 id="outlined-basic"
-                label="Description"
-                name="description"
-                variant="filled"
-              />
-            </Grid>
-            <Grid item xs={6}>
-              <TextField
-                autoComplete
-                onChange={handleChangeInput}
-                fullWidth
-                id="outlined-basic"
-                label="Buy Price"
-                type="number"
-                name="buyPrice"
-                variant="filled"
-              />
-            </Grid>
-            <Grid item xs={6}>
-              <TextField
-                autoComplete
-                onChange={handleChangeInput}
-                fullWidth
-                id="outlined-basic"
-                label="Promotion Price"
-                type="number"
-                name="promotionPrice"
+                label="orderStatus"
+                name="orderStatus"
                 variant="filled"
               />
             </Grid>
 
-            <Grid item xs={4}>
+            <Grid item xs={12}>
               <TextField
                 autoComplete
                 onChange={handleChangeInput}
                 fullWidth
                 id="outlined-basic"
-                label="Category"
-                name="category"
-                variant="filled"
-              />
-            </Grid>
-            <Grid item xs={4}>
-              <TextField
-                autoComplete
-                onChange={handleChangeInput}
-                fullWidth
-                id="outlined-basic"
-                label="Badge"
-                name="badge"
-                variant="filled"
-              />
-            </Grid>
-            <Grid item xs={4}>
-              <TextField
-                autoComplete
-                onChange={handleChangeInput}
-                fullWidth
-                id="outlined-basic"
-                label="Ratings"
-                type="number"
-                name="ratings"
-                variant="filled"
-              />
-            </Grid>
-
-            <Grid item xs={4}>
-              <TextField
-                autoComplete
-                onChange={handleChangeInput}
-                fullWidth
-                id="outlined-basic"
-                label="Color"
-                name="color"
-                variant="filled"
-              />
-            </Grid>
-            <Grid item xs={4}>
-              <TextField
-                autoComplete
-                onChange={handleChangeInput}
-                fullWidth
-                id="outlined-basic"
-                label="Size"
-                name="size"
-                variant="filled"
-              />
-            </Grid>
-            <Grid item xs={4}>
-              <TextField
-                autoComplete
-                onChange={handleChangeInput}
-                fullWidth
-                id="outlined-basic"
-                label="Amount"
-                type="number"
-                name="amount"
-                variant="filled"
-              />
-            </Grid>
-
-            <Grid item xs={4}>
-              <TextField
-                autoComplete
-                onChange={handleChangeInput}
-                fullWidth
-                id="outlined-basic"
-                label="Image first"
-                name="img1"
-                variant="filled"
-              />
-            </Grid>
-            <Grid item xs={4}>
-              <TextField
-                autoComplete
-                onChange={handleChangeInput}
-                fullWidth
-                id="outlined-basic"
-                label="Image second"
-                name="img2"
-                variant="filled"
-              />
-            </Grid>
-            <Grid item xs={4}>
-              <TextField
-                autoComplete
-                onChange={handleChangeInput}
-                fullWidth
-                id="outlined-basic"
-                label="Image third"
-                name="img3"
+                label="orderStatus"
+                name="orderStatus"
                 variant="filled"
               />
             </Grid>
@@ -263,7 +222,7 @@ export default function ModalCreateOrder({
               >
                 Cancel
               </Button>
-              <Button variant="contained" onClick={handleCreateProduct} color="success" spacing={2}>
+              <Button variant="contained" onClick={handleCreateOrder} color="success" spacing={2}>
                 Create
               </Button>
             </Grid>

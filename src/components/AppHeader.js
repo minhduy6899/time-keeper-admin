@@ -22,7 +22,6 @@ import { toggleSideBar } from 'src/actions/sidebarShowAction'
 const AppHeader = () => {
   const dispatch = useDispatch()
   const sidebarShow = useSelector((state) => state.changeState)
-  console.log('check sidebarshow>>>>', sidebarShow.sidebarShow)
   return (
     <CHeader position="sticky" className="mb-4">
       <CContainer fluid>
